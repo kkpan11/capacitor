@@ -43,7 +43,6 @@
 		62959B1D2524DA7800A3D7F1 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62959AE92524DA7700A3D7F1 /* UIColor.swift */; };
 		62959B222524DA7800A3D7F1 /* Console.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62959AEF2524DA7700A3D7F1 /* Console.swift */; };
 		62959B262524DA7800A3D7F1 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62959AF32524DA7700A3D7F1 /* WebView.swift */; };
-		62959B2F2524DA7800A3D7F1 /* DefaultPlugins.m in Sources */ = {isa = PBXBuildFile; fileRef = 62959AFD2524DA7700A3D7F1 /* DefaultPlugins.m */; };
 		62959B302524DA7800A3D7F1 /* UIStatusBarManager+CAPHandleTapAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 62959AFE2524DA7700A3D7F1 /* UIStatusBarManager+CAPHandleTapAction.m */; };
 		62959B312524DA7800A3D7F1 /* JS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62959AFF2524DA7700A3D7F1 /* JS.swift */; };
 		62959B332524DA7800A3D7F1 /* CAPPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 62959B012524DA7700A3D7F1 /* CAPPlugin.m */; };
@@ -53,7 +52,6 @@
 		62959B3A2524DA7800A3D7F1 /* CAPLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62959B082524DA7700A3D7F1 /* CAPLog.swift */; };
 		62959B3B2524DA7800A3D7F1 /* CAPPluginMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = 62959B092524DA7700A3D7F1 /* CAPPluginMethod.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62959B3C2524DA7800A3D7F1 /* CAPBridgeDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62959B0A2524DA7700A3D7F1 /* CAPBridgeDelegate.swift */; };
-		62959B402524DA7800A3D7F1 /* TmpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62959B0E2524DA7700A3D7F1 /* TmpViewController.swift */; };
 		62959B412524DA7800A3D7F1 /* Capacitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 62959B0F2524DA7700A3D7F1 /* Capacitor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62959B422524DA7800A3D7F1 /* DocLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62959B102524DA7700A3D7F1 /* DocLinks.swift */; };
 		62959B432524DA7800A3D7F1 /* Data+Capacitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62959B112524DA7700A3D7F1 /* Data+Capacitor.swift */; };
@@ -63,6 +61,7 @@
 		62959BA52526475A00A3D7F1 /* Cordova.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62959BA02526474300A3D7F1 /* Cordova.framework */; };
 		6296A77E253A2E49005A202A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6296A77D253A2E49005A202A /* AppDelegate.swift */; };
 		6296A782253A2E49005A202A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6296A781253A2E49005A202A /* ViewController.swift */; };
+		6296A7A0253A2E49005A202A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6296A7A1253A2E49005A202A /* SceneDelegate.swift */; };
 		6296A785253A2E49005A202A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6296A783253A2E49005A202A /* Main.storyboard */; };
 		6296A787253A2E49005A202A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6296A786253A2E49005A202A /* Assets.xcassets */; };
 		6296A78A253A2E49005A202A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6296A788253A2E49005A202A /* LaunchScreen.storyboard */; };
@@ -81,6 +80,8 @@
 		62FABD1A25AE5C01007B3814 /* Array+Capacitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62FABD1925AE5C01007B3814 /* Array+Capacitor.swift */; };
 		62FABD2325AE60BA007B3814 /* BridgedTypesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 62FABD2225AE60BA007B3814 /* BridgedTypesTests.m */; };
 		62FABD2B25AE6182007B3814 /* BridgedTypesHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62FABD2A25AE6182007B3814 /* BridgedTypesHelper.swift */; };
+		952707712FD9DD2D0079E5D3 /* CAPSceneDelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9527076F2FD9DD260079E5D3 /* CAPSceneDelegateProxy.swift */; };
+		957BD9402E78A4A50056874C /* SystemBars.swift in Sources */ = {isa = PBXBuildFile; fileRef = 957BD93E2E78A4A20056874C /* SystemBars.swift */; };
 		A327E6B628DB8B2900CA8B0A /* HttpRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A327E6B228DB8B2800CA8B0A /* HttpRequestHandler.swift */; };
 		A327E6B728DB8B2900CA8B0A /* CapacitorHttp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A327E6B428DB8B2900CA8B0A /* CapacitorHttp.swift */; };
 		A327E6B828DB8B2900CA8B0A /* CapacitorUrlRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A327E6B528DB8B2900CA8B0A /* CapacitorUrlRequest.swift */; };
@@ -88,8 +89,14 @@
 		A38C3D7B2848BE6F004B3680 /* CapacitorCookieManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A38C3D7A2848BE6F004B3680 /* CapacitorCookieManager.swift */; };
 		A71289E627F380A500DADDF3 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71289E527F380A500DADDF3 /* Router.swift */; };
 		A71289EB27F380FD00DADDF3 /* RouterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71289EA27F380FD00DADDF3 /* RouterTests.swift */; };
+		AA01F00D0000000000000002 /* HttpInterceptorNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA01F00D0000000000000001 /* HttpInterceptorNavigationTests.swift */; };
+		A7187FD22BD1CB7D00093C45 /* CAPPluginMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7187FD12BD1CB7D00093C45 /* CAPPluginMethod.swift */; };
 		A76739792B98E09700795F7B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A76739782B98E09700795F7B /* PrivacyInfo.xcprivacy */; };
+		A771ADEE2C8B845000AF234D /* DateCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A771ADED2C8B845000AF234D /* DateCodableTests.swift */; };
+		A771ADF12C8B909100AF234D /* URLCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A771ADF02C8B909100AF234D /* URLCodableTests.swift */; };
 		A7BE62CC2B486A5400165ACB /* KeyValueStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BE62CB2B486A5400165ACB /* KeyValueStore.swift */; };
+		A7D474D52C8BA8E8005620A8 /* DataCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D474D42C8BA8E8005620A8 /* DataCodableTests.swift */; };
+		A7D474D82C8BA8FD005620A8 /* NonconformingFloatCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D474D72C8BA8FD005620A8 /* NonconformingFloatCodableTests.swift */; };
 		A7D8B3522B238A840003FAD6 /* JSValueEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8B3512B238A840003FAD6 /* JSValueEncoder.swift */; };
 		A7D8B3632B263B8D0003FAD6 /* NestedCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8B3622B263B8D0003FAD6 /* NestedCodableTests.swift */; };
 		A7D8B3642B263B8D0003FAD6 /* Capacitor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50503EDF1FC08594003606DC /* Capacitor.framework */; };
@@ -190,7 +197,6 @@
 		62959AE92524DA7700A3D7F1 /* UIColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		62959AEF2524DA7700A3D7F1 /* Console.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Console.swift; sourceTree = "<group>"; };
 		62959AF32524DA7700A3D7F1 /* WebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
-		62959AFD2524DA7700A3D7F1 /* DefaultPlugins.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DefaultPlugins.m; sourceTree = "<group>"; };
 		62959AFE2524DA7700A3D7F1 /* UIStatusBarManager+CAPHandleTapAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIStatusBarManager+CAPHandleTapAction.m"; sourceTree = "<group>"; };
 		62959AFF2524DA7700A3D7F1 /* JS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JS.swift; sourceTree = "<group>"; };
 		62959B012524DA7700A3D7F1 /* CAPPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CAPPlugin.m; sourceTree = "<group>"; };
@@ -200,7 +206,6 @@
 		62959B082524DA7700A3D7F1 /* CAPLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CAPLog.swift; sourceTree = "<group>"; };
 		62959B092524DA7700A3D7F1 /* CAPPluginMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAPPluginMethod.h; sourceTree = "<group>"; };
 		62959B0A2524DA7700A3D7F1 /* CAPBridgeDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CAPBridgeDelegate.swift; sourceTree = "<group>"; };
-		62959B0E2524DA7700A3D7F1 /* TmpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TmpViewController.swift; sourceTree = "<group>"; };
 		62959B0F2524DA7700A3D7F1 /* Capacitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Capacitor.h; sourceTree = "<group>"; };
 		62959B102524DA7700A3D7F1 /* DocLinks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocLinks.swift; sourceTree = "<group>"; };
 		62959B112524DA7700A3D7F1 /* Data+Capacitor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Capacitor.swift"; sourceTree = "<group>"; };
@@ -215,6 +220,7 @@
 		6296A77B253A2E49005A202A /* TestsHostApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestsHostApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6296A77D253A2E49005A202A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6296A781253A2E49005A202A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		6296A7A1253A2E49005A202A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		6296A784253A2E49005A202A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		6296A786253A2E49005A202A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6296A789253A2E49005A202A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -234,6 +240,8 @@
 		62FABD1925AE5C01007B3814 /* Array+Capacitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Capacitor.swift"; sourceTree = "<group>"; };
 		62FABD2225AE60BA007B3814 /* BridgedTypesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BridgedTypesTests.m; sourceTree = "<group>"; };
 		62FABD2A25AE6182007B3814 /* BridgedTypesHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgedTypesHelper.swift; sourceTree = "<group>"; };
+		9527076F2FD9DD260079E5D3 /* CAPSceneDelegateProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CAPSceneDelegateProxy.swift; sourceTree = "<group>"; };
+		957BD93E2E78A4A20056874C /* SystemBars.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemBars.swift; sourceTree = "<group>"; };
 		A327E6B228DB8B2800CA8B0A /* HttpRequestHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpRequestHandler.swift; sourceTree = "<group>"; };
 		A327E6B428DB8B2900CA8B0A /* CapacitorHttp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CapacitorHttp.swift; sourceTree = "<group>"; };
 		A327E6B528DB8B2900CA8B0A /* CapacitorUrlRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CapacitorUrlRequest.swift; sourceTree = "<group>"; };
@@ -241,8 +249,14 @@
 		A38C3D7A2848BE6F004B3680 /* CapacitorCookieManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapacitorCookieManager.swift; sourceTree = "<group>"; };
 		A71289E527F380A500DADDF3 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		A71289EA27F380FD00DADDF3 /* RouterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterTests.swift; sourceTree = "<group>"; };
+		AA01F00D0000000000000001 /* HttpInterceptorNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpInterceptorNavigationTests.swift; sourceTree = "<group>"; };
+		A7187FD12BD1CB7D00093C45 /* CAPPluginMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CAPPluginMethod.swift; sourceTree = "<group>"; };
 		A76739782B98E09700795F7B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A771ADED2C8B845000AF234D /* DateCodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateCodableTests.swift; sourceTree = "<group>"; };
+		A771ADF02C8B909100AF234D /* URLCodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLCodableTests.swift; sourceTree = "<group>"; };
 		A7BE62CB2B486A5400165ACB /* KeyValueStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueStore.swift; sourceTree = "<group>"; };
+		A7D474D42C8BA8E8005620A8 /* DataCodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCodableTests.swift; sourceTree = "<group>"; };
+		A7D474D72C8BA8FD005620A8 /* NonconformingFloatCodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonconformingFloatCodableTests.swift; sourceTree = "<group>"; };
 		A7D8B3512B238A840003FAD6 /* JSValueEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSValueEncoder.swift; sourceTree = "<group>"; };
 		A7D8B3562B23B2110003FAD6 /* CodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableTests.swift; sourceTree = "<group>"; };
 		A7D8B3602B263B8D0003FAD6 /* CodableTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodableTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -338,6 +352,7 @@
 				62E79C712638B23300414164 /* JSExportTests.swift */,
 				62959BBD2526510200A3D7F1 /* Info.plist */,
 				A71289EA27F380FD00DADDF3 /* RouterTests.swift */,
+				AA01F00D0000000000000001 /* HttpInterceptorNavigationTests.swift */,
 			);
 			path = CapacitorTests;
 			sourceTree = "<group>";
@@ -345,6 +360,7 @@
 		62959AE12524DA7700A3D7F1 /* Capacitor */ = {
 			isa = PBXGroup;
 			children = (
+				9527076F2FD9DD260079E5D3 /* CAPSceneDelegateProxy.swift */,
 				A7D9312C2B2370EF00FF59A2 /* Codable */,
 				0F8F33B127DA980A003F49D6 /* PluginConfig.swift */,
 				A76739782B98E09700795F7B /* PrivacyInfo.xcprivacy */,
@@ -356,6 +372,7 @@
 				A7DB03AB29B001E300888AE9 /* CAPBridgedPlugin+getMethod.swift */,
 				62959B092524DA7700A3D7F1 /* CAPPluginMethod.h */,
 				62959AE82524DA7700A3D7F1 /* CAPPluginMethod.m */,
+				A7187FD12BD1CB7D00093C45 /* CAPPluginMethod.swift */,
 				62959AE22524DA7700A3D7F1 /* CAPPluginCall.h */,
 				62959B062524DA7700A3D7F1 /* CAPPluginCall.m */,
 				62959AE62524DA7700A3D7F1 /* CAPPluginCall.swift */,
@@ -384,7 +401,6 @@
 				6214934625509C3F006C36F9 /* CAPInstanceConfiguration.swift */,
 				62959B082524DA7700A3D7F1 /* CAPLog.swift */,
 				62959AE72524DA7700A3D7F1 /* CAPFile.swift */,
-				62959B0E2524DA7700A3D7F1 /* TmpViewController.swift */,
 				62959B102524DA7700A3D7F1 /* DocLinks.swift */,
 				62959B152524DA7700A3D7F1 /* CAPNotifications.swift */,
 				62959B072524DA7700A3D7F1 /* CapacitorExtension.swift */,
@@ -411,11 +427,11 @@
 		62959AEA2524DA7700A3D7F1 /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
+				957BD93E2E78A4A20056874C /* SystemBars.swift */,
 				A327E6B428DB8B2900CA8B0A /* CapacitorHttp.swift */,
 				A327E6B528DB8B2900CA8B0A /* CapacitorUrlRequest.swift */,
 				A327E6B228DB8B2800CA8B0A /* HttpRequestHandler.swift */,
 				62959AEF2524DA7700A3D7F1 /* Console.swift */,
-				62959AFD2524DA7700A3D7F1 /* DefaultPlugins.m */,
 				62959AF32524DA7700A3D7F1 /* WebView.swift */,
 				A38C3D7628484E76004B3680 /* CapacitorCookies.swift */,
 				A38C3D7A2848BE6F004B3680 /* CapacitorCookieManager.swift */,
@@ -435,6 +451,7 @@
 			isa = PBXGroup;
 			children = (
 				6296A77D253A2E49005A202A /* AppDelegate.swift */,
+				6296A7A1253A2E49005A202A /* SceneDelegate.swift */,
 				6296A781253A2E49005A202A /* ViewController.swift */,
 				62E0735125535E6500BAAADB /* configurations */,
 				6296A783253A2E49005A202A /* Main.storyboard */,
@@ -472,6 +489,10 @@
 				A7D8B3622B263B8D0003FAD6 /* NestedCodableTests.swift */,
 				A7D8B3562B23B2110003FAD6 /* CodableTests.swift */,
 				A7D8B36D2B2692300003FAD6 /* SuperCodableTests.swift */,
+				A771ADED2C8B845000AF234D /* DateCodableTests.swift */,
+				A771ADF02C8B909100AF234D /* URLCodableTests.swift */,
+				A7D474D42C8BA8E8005620A8 /* DataCodableTests.swift */,
+				A7D474D72C8BA8FD005620A8 /* NonconformingFloatCodableTests.swift */,
 			);
 			path = CodableTests;
 			sourceTree = "<group>";
@@ -695,11 +716,11 @@
 				A7D9312F2B23710300FF59A2 /* JSValueDecoder.swift in Sources */,
 				62959B362524DA7800A3D7F1 /* CAPBridgeViewController.swift in Sources */,
 				621ECCB72542045900D3D615 /* CAPBridgedJSTypes.m in Sources */,
-				62959B402524DA7800A3D7F1 /* TmpViewController.swift in Sources */,
 				621ECCD6254205BD00D3D615 /* CAPBridgeProtocol.swift in Sources */,
 				62D43AF02581817500673C24 /* WKWebView+Capacitor.swift in Sources */,
 				62959B432524DA7800A3D7F1 /* Data+Capacitor.swift in Sources */,
 				62E207AE2588234500A78983 /* WebViewDelegationHandler.swift in Sources */,
+				A7187FD22BD1CB7D00093C45 /* CAPPluginMethod.swift in Sources */,
 				621ECCBC2542046400D3D615 /* JSTypes.swift in Sources */,
 				621ECCDA254205C400D3D615 /* CapacitorBridge.swift in Sources */,
 				62959B382524DA7800A3D7F1 /* CAPPluginCall.m in Sources */,
@@ -708,6 +729,7 @@
 				A7F7EDD5292BE8520015B73B /* CAPInstancePlugin.swift in Sources */,
 				A38C3D7B2848BE6F004B3680 /* CapacitorCookieManager.swift in Sources */,
 				62959B1B2524DA7800A3D7F1 /* CAPFile.swift in Sources */,
+				952707712FD9DD2D0079E5D3 /* CAPSceneDelegateProxy.swift in Sources */,
 				62959B462524DA7800A3D7F1 /* CAPBridge.swift in Sources */,
 				62959B1D2524DA7800A3D7F1 /* UIColor.swift in Sources */,
 				62959B332524DA7800A3D7F1 /* CAPPlugin.m in Sources */,
@@ -722,6 +744,7 @@
 				62959B302524DA7800A3D7F1 /* UIStatusBarManager+CAPHandleTapAction.m in Sources */,
 				62959B392524DA7800A3D7F1 /* CapacitorExtension.swift in Sources */,
 				A327E6B628DB8B2900CA8B0A /* HttpRequestHandler.swift in Sources */,
+				957BD9402E78A4A50056874C /* SystemBars.swift in Sources */,
 				62959B422524DA7800A3D7F1 /* DocLinks.swift in Sources */,
 				62FABD1A25AE5C01007B3814 /* Array+Capacitor.swift in Sources */,
 				A7BE62CC2B486A5400165ACB /* KeyValueStore.swift in Sources */,
@@ -732,7 +755,6 @@
 				A327E6B728DB8B2900CA8B0A /* CapacitorHttp.swift in Sources */,
 				0F8F33B327DA980A003F49D6 /* PluginConfig.swift in Sources */,
 				62959B3C2524DA7800A3D7F1 /* CAPBridgeDelegate.swift in Sources */,
-				62959B2F2524DA7800A3D7F1 /* DefaultPlugins.m in Sources */,
 				623D691E254C7462002D01D1 /* CAPInstanceConfiguration.m in Sources */,
 				623D68FA254C5037002D01D1 /* KeyPath.swift in Sources */,
 				62959B222524DA7800A3D7F1 /* Console.swift in Sources */,
@@ -758,6 +780,7 @@
 				62FABD2325AE60BA007B3814 /* BridgedTypesTests.m in Sources */,
 				621ECCC3254204B700D3D615 /* BridgedTypesTests.swift in Sources */,
 				A71289EB27F380FD00DADDF3 /* RouterTests.swift in Sources */,
+				AA01F00D0000000000000002 /* HttpInterceptorNavigationTests.swift in Sources */,
 				6263686025F6EC0100576C1C /* PluginCallAccessorTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -768,6 +791,7 @@
 			files = (
 				6296A782253A2E49005A202A /* ViewController.swift in Sources */,
 				6296A77E253A2E49005A202A /* AppDelegate.swift in Sources */,
+				6296A7A0253A2E49005A202A /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -775,9 +799,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A771ADEE2C8B845000AF234D /* DateCodableTests.swift in Sources */,
 				A7D8B3632B263B8D0003FAD6 /* NestedCodableTests.swift in Sources */,
+				A7D474D52C8BA8E8005620A8 /* DataCodableTests.swift in Sources */,
 				A7D8B36A2B263B990003FAD6 /* CodableTests.swift in Sources */,
 				A7D8B36E2B2692300003FAD6 /* SuperCodableTests.swift in Sources */,
+				A7D474D82C8BA8FD005620A8 /* NonconformingFloatCodableTests.swift in Sources */,
+				A771ADF12C8B909100AF234D /* URLCodableTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -873,7 +901,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -931,7 +959,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -958,6 +986,7 @@
 				);
 				INFOPLIST_FILE = Capacitor/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = Capacitor/Capacitor.modulemap;
 				PRODUCT_BUNDLE_IDENTIFIER = com.capacitorjs.ios.Capacitor;
@@ -987,6 +1016,7 @@
 				);
 				INFOPLIST_FILE = Capacitor/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = Capacitor/Capacitor.modulemap;
 				PRODUCT_BUNDLE_IDENTIFIER = com.capacitorjs.ios.Capacitor;
@@ -1050,7 +1080,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = TestsHostApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1073,7 +1103,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = TestsHostApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.capacitorjs.ios.TestsHostApp;
@@ -1096,7 +1126,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -1123,7 +1153,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;

@@ -2,12 +2,13 @@
  * @jest-environment jsdom
  */
 
+/// <reference lib="es2021.weakref" />
+import { setFlagsFromString } from 'v8';
+import { runInNewContext } from 'vm';
+
 import { initBridge } from '../../native-bridge';
 import type { CapacitorGlobal, Plugin } from '../definitions';
-import type {
-  WindowCapacitor,
-  CapacitorInstance,
-} from '../definitions-internal';
+import type { WindowCapacitor, CapacitorInstance } from '../definitions-internal';
 import { initCapacitorGlobal } from '../runtime';
 import { ExceptionCode } from '../util';
 import { WebPlugin } from '../web-plugin';
@@ -23,7 +24,7 @@ describe('plugin', () => {
     global.setImmediate = global.setTimeout;
   });
 
-  it('error from missing method from native implementation', async done => {
+  it('error from missing method from native implementation', async (done) => {
     // mock the global with the android bridge
     mockAndroidBridge();
     initBridge(win);
@@ -38,14 +39,6 @@ describe('plugin', () => {
     try {
       const Awesome = cap.registerPlugin<AwesomePlugin>('Awesome');
       await Awesome.mph();
-      done('did not throw');
-    } catch (e) {
-      expect(e.message).toBe(`"Awesome.mph()" is not implemented on android`);
-      expect(e.code).toBe(ExceptionCode.Unimplemented);
-    }
-
-    try {
-      await cap.Plugins.Awesome.mph();
       done('did not throw');
     } catch (e) {
       expect(e.message).toBe(`"Awesome.mph()" is not implemented on android`);
@@ -71,12 +64,9 @@ describe('plugin', () => {
 
     const results1 = await Awesome.mph();
     expect(results1).toBe(88);
-
-    const results2 = await cap.Plugins.Awesome.mph();
-    expect(results2).toBe(88);
   });
 
-  it('error from missing native implementation', async done => {
+  it('error from missing native implementation', async (done) => {
     // mock the global with the android bridge
     mockAndroidBridge();
     initBridge(win);
@@ -93,19 +83,11 @@ describe('plugin', () => {
     } catch (e) {
       expect(e.message).toBe(`"Awesome" plugin is not implemented on android`);
       expect(e.code).toBe(ExceptionCode.Unimplemented);
-    }
-
-    try {
-      await cap.Plugins.Awesome.mph();
-      done('did not throw');
-    } catch (e) {
-      expect(e.message).toBe(`"Awesome" plugin is not implemented on android`);
-      expect(e.code).toBe(ExceptionCode.Unimplemented);
       done();
     }
   });
 
-  it('error lazy loading implementation', async done => {
+  it('error lazy loading implementation', async (done) => {
     mockAndroidBridge();
     initBridge(win);
 
@@ -119,13 +101,6 @@ describe('plugin', () => {
 
     try {
       await Awesome.mph();
-      done('did not throw');
-    } catch (e) {
-      expect(e).toBe('unable to load module');
-    }
-
-    try {
-      await cap.Plugins.Awesome.mph();
       done('did not throw');
     } catch (e) {
       expect(e).toBe('unable to load module');
@@ -151,9 +126,7 @@ describe('plugin', () => {
     });
 
     const p1 = Awesome.mph();
-    const p2 = cap.Plugins.Awesome.mph();
     expect(await p1).toBe(88);
-    expect(await p2).toBe(88);
 
     const rtn2 = await Awesome.mph();
     expect(rtn2).toBe(88);
@@ -181,9 +154,6 @@ describe('plugin', () => {
 
     const rtn2 = await Awesome.mph();
     expect(rtn2).toBe(88);
-
-    const rtn3 = await cap.Plugins.Awesome.mph();
-    expect(rtn3).toBe(88);
   });
 
   it('call method that had an error', async () => {
@@ -201,10 +171,9 @@ describe('plugin', () => {
     });
 
     expect(async () => Awesome.mph()).rejects.toThrowError('nope!');
-    expect(async () => cap.Plugins.Awesome.mph()).rejects.toThrowError('nope!');
   });
 
-  it('missing method on lazy loaded implementation', async done => {
+  it('missing method on lazy loaded implementation', async (done) => {
     cap = initCapacitorGlobal(win);
 
     const Awesome = cap.registerPlugin<AwesomePlugin>('Awesome', {
@@ -217,19 +186,11 @@ describe('plugin', () => {
     } catch (e) {
       expect(e.message).toBe(`"Awesome.mph()" is not implemented on web`);
       expect(e.code).toBe(ExceptionCode.Unimplemented);
-    }
-
-    try {
-      await cap.Plugins.Awesome.mph();
-      done('did not throw error');
-    } catch (e) {
-      expect(e.message).toBe(`"Awesome.mph()" is not implemented on web`);
-      expect(e.code).toBe(ExceptionCode.Unimplemented);
       done();
     }
   });
 
-  it('missing method on already loaded implementation', async done => {
+  it('missing method on already loaded implementation', async (done) => {
     mockAndroidBridge();
     initBridge(win);
 
@@ -245,19 +206,11 @@ describe('plugin', () => {
     } catch (e) {
       expect(e.message).toBe(`"Awesome.mph()" is not implemented on android`);
       expect(e.code).toBe(ExceptionCode.Unimplemented);
-    }
-
-    try {
-      await cap.Plugins.Awesome.mph();
-      done('should throw error');
-    } catch (e) {
-      expect(e.message).toBe(`"Awesome.mph()" is not implemented on android`);
-      expect(e.code).toBe(ExceptionCode.Unimplemented);
       done();
     }
   });
 
-  it('no web platform implementation', async done => {
+  it('no web platform implementation', async (done) => {
     cap = initCapacitorGlobal(win);
     expect(cap.getPlatform()).toBe('web');
 
@@ -269,19 +222,11 @@ describe('plugin', () => {
     } catch (e) {
       expect(e.message).toBe(`"Awesome" plugin is not implemented on web`);
       expect(e.code).toBe(ExceptionCode.Unimplemented);
-    }
-
-    try {
-      await cap.Plugins.Awesome.mph();
-      done('should throw error');
-    } catch (e) {
-      expect(e.message).toBe(`"Awesome" plugin is not implemented on web`);
-      expect(e.code).toBe(ExceptionCode.Unimplemented);
       done();
     }
   });
 
-  it('no native platform implementation', async done => {
+  it('no native platform implementation', async (done) => {
     mockAndroidBridge();
     initBridge(win);
 
@@ -294,14 +239,6 @@ describe('plugin', () => {
 
     try {
       await Awesome.mph();
-      done('should throw error');
-    } catch (e) {
-      expect(e.message).toBe(`"Awesome" plugin is not implemented on android`);
-      expect(e.code).toBe(ExceptionCode.Unimplemented);
-    }
-
-    try {
-      await cap.Plugins.Awesome.mph();
       done('should throw error');
     } catch (e) {
       expect(e.message).toBe(`"Awesome" plugin is not implemented on android`);
@@ -324,7 +261,7 @@ describe('plugin', () => {
     expect(Awesome1).toBe(Awesome2);
   });
 
-  it('addListener, w/out addListener on implementation', async done => {
+  it('addListener, w/out addListener on implementation', async (done) => {
     const LazyWeb = class {
       val = 88;
       async addListener(_eventName: string, fn: any) {
@@ -337,7 +274,7 @@ describe('plugin', () => {
       web: async () => new LazyWeb(),
     });
 
-    Awesome.addListener('eventName', data => {
+    Awesome.addListener('eventName', (data) => {
       try {
         expect(data).toEqual(88);
         done();
@@ -381,7 +318,114 @@ describe('plugin', () => {
     expect(typeof (rtn as any).remove === 'function').toBe(true);
   });
 
-  it('async removeAllListeners on web, lazy load and call implementation', async done => {
+  it('stops delivering native events once the listener is removed', async () => {
+    const messages = mockRecordingAndroidBridge();
+    initBridge(win);
+    mockAndroidPlugin('Awesome', 'mph');
+
+    cap = initCapacitorGlobal(win);
+
+    const Awesome = cap.registerPlugin<AwesomePlugin>('Awesome');
+
+    const received: unknown[] = [];
+    const handle = await Awesome.addListener('eventName', (data) => received.push(data));
+    const listenerId = callbackIdOf(messages, 'addListener');
+
+    sendFromNative(listenerId, { n: 1 });
+    await handle.remove();
+    sendFromNative(listenerId, { n: 2 });
+
+    expect(received).toEqual([{ n: 1 }]);
+  });
+
+  it('does not store a callback for removeListener', async () => {
+    const messages = mockRecordingAndroidBridge();
+    initBridge(win);
+    mockAndroidPlugin('Awesome', 'mph');
+
+    cap = initCapacitorGlobal(win);
+
+    const Awesome = cap.registerPlugin<AwesomePlugin>('Awesome');
+
+    const handle = await Awesome.addListener('eventName', () => {
+      // ignore
+    });
+    await handle.remove();
+
+    expect(callbackIdOf(messages, 'removeListener')).toBe('-1');
+  });
+
+  it('stops delivering native events after removeAllListeners, only for that plugin', async () => {
+    const messages = mockRecordingAndroidBridge();
+    initBridge(win);
+    mockAndroidPlugin('Awesome', 'mph');
+    mockAndroidPlugin('Other', 'mph');
+
+    cap = initCapacitorGlobal(win);
+
+    const Awesome = cap.registerPlugin<AwesomePlugin>('Awesome');
+    const Other = cap.registerPlugin<AwesomePlugin>('Other');
+
+    const received: unknown[] = [];
+    await Awesome.addListener('eventName', (data) => received.push(['Awesome', data]));
+    await Other.addListener('eventName', (data) => received.push(['Other', data]));
+
+    const removing = Awesome.removeAllListeners();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    sendFromNative(callbackIdOf(messages, 'removeAllListeners'));
+    await removing;
+
+    sendFromNative(callbackIdOf(messages, 'addListener', 'Awesome'), { n: 1 });
+    sendFromNative(callbackIdOf(messages, 'addListener', 'Other'), { n: 1 });
+
+    expect(received).toEqual([['Other', { n: 1 }]]);
+  });
+
+  it('stops delivering native events once a Capacitor.addListener handle is removed', async () => {
+    const messages = mockRecordingAndroidBridge();
+    initBridge(win);
+
+    const received: unknown[] = [];
+    const handle = (win as any).Capacitor.addListener('Awesome', 'eventName', (data: unknown) => received.push(data));
+    const listenerId = callbackIdOf(messages, 'addListener');
+
+    sendFromNative(listenerId, { n: 1 });
+    await handle.remove();
+    sendFromNative(listenerId, { n: 2 });
+
+    expect(received).toEqual([{ n: 1 }]);
+  });
+
+  it('lets a removed native listener be garbage collected', async () => {
+    setFlagsFromString('--expose-gc');
+    const collectGarbage = runInNewContext('gc') as () => void;
+
+    mockAndroidBridge();
+    initBridge(win);
+    mockAndroidPlugin('Awesome', 'mph');
+
+    cap = initCapacitorGlobal(win);
+
+    const Awesome = cap.registerPlugin<AwesomePlugin>('Awesome');
+
+    // stands in for what a real listener closes over, such as an iframe's window
+    let captured: WeakRef<object> | undefined;
+    const register = () => {
+      const capture = {};
+      captured = new WeakRef(capture);
+      return Awesome.addListener('eventName', () => capture);
+    };
+    const handle = await register();
+    await handle.remove();
+
+    // a WeakRef keeps its target alive until the current job ends, so collect in a later one
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    collectGarbage();
+
+    expect(captured?.deref()).toBeUndefined();
+  });
+
+  it('async removeAllListeners on web, lazy load and call implementation', async (done) => {
     const AwesomeWeb = class extends WebPlugin {
       async removeAllListeners() {
         setImmediate(() => done());
@@ -404,6 +448,23 @@ describe('plugin', () => {
     };
   };
 
+  const mockRecordingAndroidBridge = () => {
+    const messages: any[] = [];
+    win.androidBridge = {
+      postMessage: (m) => {
+        messages.push(JSON.parse(m));
+      },
+    };
+    return messages;
+  };
+
+  const callbackIdOf = (messages: any[], methodName: string, pluginId = 'Awesome'): string =>
+    messages.find((m) => m.methodName === methodName && m.pluginId === pluginId).callbackId;
+
+  const sendFromNative = (callbackId: string, data = {}) => {
+    (win as any).Capacitor.fromNative({ callbackId, success: true, data });
+  };
+
   const mockAndroidPlugin = (pluginClassName: string, methodName: string) => {
     const w: any = win;
     w.Capacitor = w.Capacitor ?? {};
@@ -414,7 +475,8 @@ describe('plugin', () => {
         { name: methodName, rtype: 'promise' },
         { name: 'addListener' },
         { name: 'removeListener' },
-        { name: 'removeAllListeners' },
+        // matches the real header on both platforms
+        { name: 'removeAllListeners', rtype: 'promise' },
       ],
     });
   };

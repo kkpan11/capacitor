@@ -15,8 +15,8 @@ internal class JSExport {
     static let catchallOptionsParameter = "_options"
     static let callbackParameter = "_callback"
 
-    static func exportCapacitorGlobalJS(userContentController: WKUserContentController, isDebug: Bool, loggingEnabled: Bool, localUrl: String) throws {
-        let data = "window.Capacitor = { DEBUG: \(isDebug), isLoggingEnabled: \(loggingEnabled), Plugins: {} }; window.WEBVIEW_SERVER_URL = '\(localUrl)';"
+    static func exportCapacitorGlobalJS(userContentController: WKUserContentController, isDebug: Bool, loggingEnabled: Bool, localUrl: String, cookiesEnabled: Bool, httpEnabled: Bool) throws {
+        let data = "window.Capacitor = { DEBUG: \(isDebug), isLoggingEnabled: \(loggingEnabled), Plugins: {} }; window.WEBVIEW_SERVER_URL = '\(localUrl)'; window.CapacitorNativeConfig = { cookiesEnabled: \(cookiesEnabled), httpEnabled: \(httpEnabled) };"
         let userScript = WKUserScript(source: data, injectionTime: .atDocumentStart, forMainFrameOnly: true)
         userContentController.addUserScript(userScript)
     }
@@ -53,6 +53,20 @@ internal class JSExport {
         }
     }
 
+    static func exportMiscFileJS(paths: [String], userContentController: WKUserContentController) {
+        for path in paths {
+            if let miscJSFilePath = Bundle.main.url(forResource: "public/\(path.replacingOccurrences(of: ".js", with: ""))", withExtension: "js") {
+                do {
+                    try self.injectFile(fileURL: miscJSFilePath, userContentController: userContentController)
+                } catch {
+                    CAPLog.print("WARNING: Unable to inject js from path \(miscJSFilePath)")
+                }
+            } else {
+                CAPLog.print("WARNING: Unable to inject js from path \(path)")
+            }
+        }
+    }
+
     /**
      Export the JS required to implement the given plugin.
      */
@@ -66,6 +80,9 @@ internal class JSExport {
                     var t = (p['\(plugin.jsName)'] = {});
                     t.addListener = function(eventName, callback) {
                     return w.Capacitor.addListener('\(plugin.jsName)', eventName, callback);
+                    }
+                    t.removeAllListeners = function() {
+                    return w.Capacitor.nativePromise('\(plugin.jsName)', 'removeAllListeners');
                     }
                     """)
 

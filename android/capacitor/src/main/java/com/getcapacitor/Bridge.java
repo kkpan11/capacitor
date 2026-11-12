@@ -15,7 +15,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.webkit.ServiceWorkerClient;
+import android.webkit.ServiceWorkerController;
 import android.webkit.ValueCallback;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import androidx.activity.result.ActivityResultCallback;
@@ -75,7 +79,6 @@ import org.json.JSONException;
  */
 public class Bridge {
 
-    private static final String PREFS_NAME = "CapacitorSettings";
     private static final String PERMISSION_PREFS_NAME = "PluginPermStates";
     private static final String BUNDLE_LAST_PLUGIN_ID_KEY = "capacitorLastActivityPluginId";
     private static final String BUNDLE_LAST_PLUGIN_CALL_METHOD_NAME_KEY = "capacitorLastActivityPluginMethod";
@@ -92,7 +95,12 @@ public class Bridge {
     public static final String CAPACITOR_FILE_START = "/_capacitor_file_";
     public static final String CAPACITOR_CONTENT_START = "/_capacitor_content_";
     public static final String CAPACITOR_HTTP_INTERCEPTOR_START = "/_capacitor_http_interceptor_";
+
+    /** @deprecated CAPACITOR_HTTPS_INTERCEPTOR_START is no longer required. All proxied requests are handled via CAPACITOR_HTTP_INTERCEPTOR_START instead */
+    @Deprecated
     public static final String CAPACITOR_HTTPS_INTERCEPTOR_START = "/_capacitor_https_interceptor_";
+
+    public static final String CAPACITOR_HTTP_INTERCEPTOR_URL_PARAM = "u";
 
     public static final int DEFAULT_ANDROID_WEBVIEW_VERSION = 60;
     public static final int MINIMUM_ANDROID_WEBVIEW_VERSION = 55;
@@ -113,6 +121,8 @@ public class Bridge {
     private HostMask appAllowNavigationMask;
     private Set<String> allowedOriginRules = new HashSet<String>();
     private ArrayList<String> authorities = new ArrayList<>();
+    private ArrayList<String> miscJSFileInjections = new ArrayList<String>();
+    private Boolean canInjectJS = true;
     // A reference to the main WebView for the app
     private final WebView webView;
     public final MockCordovaInterfaceImpl cordovaInterface;
@@ -254,17 +264,13 @@ public class Bridge {
         // Start the local web server
         JSInjector injector = getJSInjector();
         if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-            String allowedOrigin = appUrl;
-            Uri appUri = Uri.parse(appUrl);
-            if (appUri.getPath() != null) {
-                if (appUri.getPath().equals("/")) {
-                    allowedOrigin = appUrl.substring(0, appUrl.length() - 1);
-                } else {
-                    allowedOrigin = appUri.toString().replace(appUri.getPath(), "");
-                }
+            String allowedOrigin = Uri.parse(appUrl).buildUpon().path(null).fragment(null).clearQuery().build().toString();
+            try {
+                WebViewCompat.addDocumentStartJavaScript(webView, injector.getScriptString(), Collections.singleton(allowedOrigin));
+                injector = null;
+            } catch (IllegalArgumentException ex) {
+                Logger.warn("Invalid url, using fallback");
             }
-            WebViewCompat.addDocumentStartJavaScript(webView, injector.getScriptString(), Collections.singleton(allowedOrigin));
-            injector = null;
         }
         localServer = new WebViewLocalServer(context, this, injector, authorities, html5mode);
         localServer.hostAssets(DEFAULT_WEB_ASSET_DIR);
@@ -274,9 +280,23 @@ public class Bridge {
         webView.setWebChromeClient(new BridgeWebChromeClient(this));
         webView.setWebViewClient(this.webViewClient);
 
+        if (config.isResolveServiceWorkerRequests()) {
+            ServiceWorkerController swController = ServiceWorkerController.getInstance();
+            swController.setServiceWorkerClient(
+                new ServiceWorkerClient() {
+                    @Override
+                    public WebResourceResponse shouldInterceptRequest(WebResourceRequest request) {
+                        return getLocalServer().shouldInterceptRequest(request);
+                    }
+                }
+            );
+        }
+
         if (!isDeployDisabled() && !isNewBinary()) {
-            SharedPreferences prefs = getContext()
-                .getSharedPreferences(com.getcapacitor.plugin.WebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
+            SharedPreferences prefs = getContext().getSharedPreferences(
+                com.getcapacitor.plugin.WebView.WEBVIEW_PREFS_NAME,
+                Activity.MODE_PRIVATE
+            );
             String path = prefs.getString(com.getcapacitor.plugin.WebView.CAP_SERVER_PATH, null);
             if (path != null && !path.isEmpty() && new File(path).exists()) {
                 setServerBasePath(path);
@@ -328,11 +348,7 @@ public class Bridge {
 
         // Otherwise manually check WebView versions
         try {
-            String webViewPackage = "com.google.android.webview";
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                webViewPackage = "com.android.chrome";
-            }
-            PackageInfo info = InternalUtils.getPackageInfo(pm, webViewPackage);
+            PackageInfo info = InternalUtils.getPackageInfo(pm, "com.android.chrome");
             String majorVersionStr = info.versionName.split("\\.")[0];
             int majorVersion = Integer.parseInt(majorVersionStr);
             return majorVersion >= config.getMinWebViewVersion();
@@ -371,6 +387,12 @@ public class Bridge {
     }
 
     public boolean launchIntent(Uri url) {
+        // The proxy returns a remote body at the app origin, so block it before plugins can allow it.
+        String path = url.getPath();
+        if (path != null && path.startsWith(CAPACITOR_HTTP_INTERCEPTOR_START)) {
+            return true;
+        }
+
         /*
          * Give plugins the chance to handle the url
          */
@@ -384,7 +406,7 @@ public class Bridge {
             }
         }
 
-        if (url.getScheme().equals("data")) {
+        if (url.getScheme().equals("data") || url.getScheme().equals("blob")) {
             return false;
         }
 
@@ -407,8 +429,10 @@ public class Bridge {
     private boolean isNewBinary() {
         String versionCode = "";
         String versionName = "";
-        SharedPreferences prefs = getContext()
-            .getSharedPreferences(com.getcapacitor.plugin.WebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
+        SharedPreferences prefs = getContext().getSharedPreferences(
+            com.getcapacitor.plugin.WebView.WEBVIEW_PREFS_NAME,
+            Activity.MODE_PRIVATE
+        );
         String lastVersionCode = prefs.getString(LAST_BINARY_VERSION_CODE, null);
         String lastVersionName = prefs.getString(LAST_BINARY_VERSION_NAME, null);
 
@@ -416,7 +440,7 @@ public class Bridge {
             PackageManager pm = getContext().getPackageManager();
             PackageInfo pInfo = InternalUtils.getPackageInfo(pm, getContext().getPackageName());
             versionCode = Integer.toString((int) PackageInfoCompat.getLongVersionCode(pInfo));
-            versionName = pInfo.versionName;
+            versionName = pInfo.versionName != null ? pInfo.versionName : "";
         } catch (Exception ex) {
             Logger.error("Unable to get package info", ex);
         }
@@ -444,9 +468,9 @@ public class Bridge {
         if (ex instanceof SocketTimeoutException) {
             Logger.error(
                 "Unable to load app. Ensure the server is running at " +
-                appUrl +
-                ", or modify the " +
-                "appUrl setting in capacitor.config.json (make sure to npx cap copy after to commit changes).",
+                    appUrl +
+                    ", or modify the " +
+                    "appUrl setting in capacitor.config.json (make sure to npx cap copy after to commit changes).",
                 ex
             );
         }
@@ -551,6 +575,9 @@ public class Bridge {
 
     public void reset() {
         savedCalls = new HashMap<>();
+        for (PluginHandle handle : this.plugins.values()) {
+            handle.getInstance().removeAllListeners();
+        }
     }
 
     /**
@@ -562,7 +589,6 @@ public class Bridge {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setGeolocationEnabled(true);
-        settings.setDatabaseEnabled(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
         if (this.config.isMixedContentAllowed()) {
@@ -608,11 +634,11 @@ public class Bridge {
             try {
                 URL appUrlObject = new URL(appUrlConfig);
                 authorities.add(appUrlObject.getAuthority());
+                localUrl = appUrlObject.getProtocol() + "://" + appUrlObject.getAuthority();
             } catch (Exception ex) {
                 Logger.error("Provided server url is invalid: " + ex.getMessage());
                 return;
             }
-            localUrl = appUrlConfig;
             appUrl = appUrlConfig;
         } else {
             appUrl = localUrl;
@@ -635,6 +661,7 @@ public class Bridge {
         this.registerPlugin(com.getcapacitor.plugin.CapacitorCookies.class);
         this.registerPlugin(com.getcapacitor.plugin.WebView.class);
         this.registerPlugin(com.getcapacitor.plugin.CapacitorHttp.class);
+        this.registerPlugin(com.getcapacitor.plugin.SystemBars.class);
 
         for (Class<? extends Plugin> pluginClass : this.initialPlugins) {
             this.registerPlugin(pluginClass);
@@ -728,9 +755,9 @@ public class Bridge {
     private void logInvalidPluginException(Class<? extends Plugin> clazz) {
         Logger.error(
             "NativePlugin " +
-            clazz.getName() +
-            " is invalid. Ensure the @CapacitorPlugin annotation exists on the plugin class and" +
-            " the class extends Plugin"
+                clazz.getName() +
+                " is invalid. Ensure the @CapacitorPlugin annotation exists on the plugin class and" +
+                " the class extends Plugin"
         );
     }
 
@@ -805,13 +832,13 @@ public class Bridge {
             if (Logger.shouldLog()) {
                 Logger.verbose(
                     "callback: " +
-                    call.getCallbackId() +
-                    ", pluginId: " +
-                    plugin.getId() +
-                    ", methodName: " +
-                    methodName +
-                    ", methodData: " +
-                    call.getData().toString()
+                        call.getCallbackId() +
+                        ", pluginId: " +
+                        plugin.getId() +
+                        ", methodName: " +
+                        methodName +
+                        ", methodData: " +
+                        call.getData().toString()
                 );
             }
 
@@ -858,11 +885,11 @@ public class Bridge {
     }
 
     public void triggerJSEvent(final String eventName, final String target) {
-        eval("window.Capacitor.triggerEvent(\"" + eventName + "\", \"" + target + "\")", s -> {});
+        eval("window.Capacitor.triggerEvent(\"" + eventName + "\", \"" + target + "\")", (s) -> {});
     }
 
     public void triggerJSEvent(final String eventName, final String target, final String data) {
-        eval("window.Capacitor.triggerEvent(\"" + eventName + "\", \"" + target + "\", " + data + ")", s -> {});
+        eval("window.Capacitor.triggerEvent(\"" + eventName + "\", \"" + target + "\", " + data + ")", (s) -> {});
     }
 
     public void triggerWindowJSEvent(final String eventName) {
@@ -1002,12 +1029,26 @@ public class Bridge {
             String cordovaPluginsJS = JSExport.getCordovaPluginJS(context);
             String cordovaPluginsFileJS = JSExport.getCordovaPluginsFileJS(context);
             String localUrlJS = "window.WEBVIEW_SERVER_URL = '" + localUrl + "';";
+            String miscJS = JSExport.getMiscFileJS(miscJSFileInjections, context);
 
-            return new JSInjector(globalJS, bridgeJS, pluginJS, cordovaJS, cordovaPluginsJS, cordovaPluginsFileJS, localUrlJS);
+            miscJSFileInjections = new ArrayList<>();
+            canInjectJS = false;
+
+            return new JSInjector(globalJS, bridgeJS, pluginJS, cordovaJS, cordovaPluginsJS, cordovaPluginsFileJS, localUrlJS, miscJS);
         } catch (Exception ex) {
             Logger.error("Unable to export Capacitor JS. App will not function!", ex);
         }
         return null;
+    }
+
+    /**
+     * Inject JavaScript from an external file before the WebView loads.
+     * @param path relative to public folder
+     */
+    public void injectScriptBeforeLoad(String path) {
+        if (canInjectJS) {
+            miscJSFileInjections.add(path);
+        }
     }
 
     /**
@@ -1025,8 +1066,13 @@ public class Bridge {
                 try {
                     JSObject options = new JSObject(lastOptionsJson);
 
-                    pluginCallForLastActivity =
-                        new PluginCall(msgHandler, lastPluginId, PluginCall.CALLBACK_ID_DANGLING, lastPluginCallMethod, options);
+                    pluginCallForLastActivity = new PluginCall(
+                        msgHandler,
+                        lastPluginId,
+                        PluginCall.CALLBACK_ID_DANGLING,
+                        lastPluginCallMethod,
+                        options
+                    );
                 } catch (JSONException ex) {
                     Logger.error("Unable to restore plugin call, unable to parse persisted JSON object", ex);
                 }
@@ -1174,45 +1220,51 @@ public class Bridge {
     protected Map<String, PermissionState> getPermissionStates(Plugin plugin) {
         Map<String, PermissionState> permissionsResults = new HashMap<>();
         CapacitorPlugin annotation = plugin.getPluginHandle().getPluginAnnotation();
-        for (Permission perm : annotation.permissions()) {
-            // If a permission is defined with no permission constants, return GRANTED for it.
-            // Otherwise, get its true state.
-            if (perm.strings().length == 0 || (perm.strings().length == 1 && perm.strings()[0].isEmpty())) {
-                String key = perm.alias();
-                if (!key.isEmpty()) {
-                    PermissionState existingResult = permissionsResults.get(key);
+        if (annotation != null) {
+            for (Permission perm : annotation.permissions()) {
+                // If a permission is defined with no permission constants, return GRANTED for it.
+                // Otherwise, get its true state.
+                if (perm.strings().length == 0 || (perm.strings().length == 1 && perm.strings()[0].isEmpty())) {
+                    String key = perm.alias();
+                    if (!key.isEmpty()) {
+                        PermissionState existingResult = permissionsResults.get(key);
 
-                    // auto set permission state to GRANTED if the alias is empty.
-                    if (existingResult == null) {
-                        permissionsResults.put(key, PermissionState.GRANTED);
-                    }
-                }
-            } else {
-                for (String permString : perm.strings()) {
-                    String key = perm.alias().isEmpty() ? permString : perm.alias();
-                    PermissionState permissionStatus;
-                    if (ActivityCompat.checkSelfPermission(this.getContext(), permString) == PackageManager.PERMISSION_GRANTED) {
-                        permissionStatus = PermissionState.GRANTED;
-                    } else {
-                        permissionStatus = PermissionState.PROMPT;
-
-                        // Check if there is a cached permission state for the "Never ask again" state
-                        SharedPreferences prefs = getContext().getSharedPreferences(PERMISSION_PREFS_NAME, Activity.MODE_PRIVATE);
-                        String state = prefs.getString(permString, null);
-
-                        if (state != null) {
-                            permissionStatus = PermissionState.byState(state);
+                        // auto set permission state to GRANTED if the alias is empty.
+                        if (existingResult == null) {
+                            permissionsResults.put(key, PermissionState.GRANTED);
                         }
                     }
+                } else {
+                    for (String permString : perm.strings()) {
+                        String key = perm.alias().isEmpty() ? permString : perm.alias();
+                        PermissionState permissionStatus;
+                        if (ActivityCompat.checkSelfPermission(this.getContext(), permString) == PackageManager.PERMISSION_GRANTED) {
+                            permissionStatus = PermissionState.GRANTED;
+                        } else {
+                            permissionStatus = PermissionState.PROMPT;
 
-                    PermissionState existingResult = permissionsResults.get(key);
+                            // Check if there is a cached permission state for the "Never ask again" state
+                            SharedPreferences prefs = getContext().getSharedPreferences(PERMISSION_PREFS_NAME, Activity.MODE_PRIVATE);
+                            String state = prefs.getString(permString, null);
 
-                    // multiple permissions with the same alias must all be true, otherwise all false.
-                    if (existingResult == null || existingResult == PermissionState.GRANTED) {
-                        permissionsResults.put(key, permissionStatus);
+                            if (state != null) {
+                                permissionStatus = PermissionState.byState(state);
+                            }
+                        }
+
+                        PermissionState existingResult = permissionsResults.get(key);
+
+                        // multiple permissions with the same alias must all be true, otherwise all false.
+                        if (existingResult == null || existingResult == PermissionState.GRANTED) {
+                            permissionsResults.put(key, permissionStatus);
+                        }
                     }
                 }
             }
+        } else {
+            Logger.warn(
+                String.format("getPermissionStates: missing @CapacitorPlugin annotation for plugin %s", plugin.getPluginHandle().getId())
+            );
         }
 
         return permissionsResults;
@@ -1569,8 +1621,7 @@ public class Bridge {
                 config
             );
 
-            if (webView instanceof CapacitorWebView) {
-                CapacitorWebView capacitorWebView = (CapacitorWebView) webView;
+            if (webView instanceof CapacitorWebView capacitorWebView) {
                 capacitorWebView.setBridge(bridge);
             }
 

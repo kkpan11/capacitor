@@ -1,11 +1,12 @@
 import Foundation
-import MobileCoreServices
+import UniformTypeIdentifiers
 
 @objc(CAPWebViewAssetHandler)
 // swiftlint:disable type_body_length
 open class WebViewAssetHandler: NSObject, WKURLSchemeHandler {
     private var router: Router
     private var serverUrl: URL?
+    private var configuration: InstanceConfiguration?
 
     public init(router: Router) {
         self.router = router
@@ -20,6 +21,10 @@ open class WebViewAssetHandler: NSObject, WKURLSchemeHandler {
         self.serverUrl = serverUrl
     }
 
+    open func setConfiguration(_ configuration: InstanceConfiguration?) {
+        self.configuration = configuration
+    }
+
     private func isUsingLiveReload(_ localUrl: URL) -> Bool {
         return self.serverUrl != nil && self.serverUrl?.scheme != localUrl.scheme
     }
@@ -31,12 +36,13 @@ open class WebViewAssetHandler: NSObject, WKURLSchemeHandler {
         let localUrl = URL.init(string: url.absoluteString)!
 
         if url.path.starts(with: CapacitorBridge.httpInterceptorStartIdentifier) {
-            handleCapacitorHttpRequest(urlSchemeTask, localUrl, false)
-            return
-        }
-
-        if url.path.starts(with: CapacitorBridge.httpsInterceptorStartIdentifier) {
-            handleCapacitorHttpRequest(urlSchemeTask, localUrl, true)
+            // Only serve the proxy when CapacitorHttp is on. A scheme task can't tell a document from
+            // a subresource, so keeping documents out relies on the check in decidePolicyFor.
+            if configuration?.getPluginConfig("CapacitorHttp").getBoolean("enabled", false) == true {
+                handleCapacitorHttpRequest(urlSchemeTask, localUrl, false)
+            } else {
+                urlSchemeTask.didFailWithError(URLError(.unsupportedURL))
+            }
             return
         }
 
@@ -63,8 +69,7 @@ open class WebViewAssetHandler: NSObject, WKURLSchemeHandler {
             }
 
             if let rangeString = urlSchemeTask.request.value(forHTTPHeaderField: "Range"),
-               let totalSize = try fileUrl.resourceValues(forKeys: [.fileSizeKey]).fileSize,
-               isMediaExtension(pathExtension: url.pathExtension) {
+               let totalSize = try fileUrl.resourceValues(forKeys: [.fileSizeKey]).fileSize {
                 let fileHandle = try FileHandle(forReadingFrom: fileUrl)
                 let parts = rangeString.components(separatedBy: "=")
                 let streamParts = parts[1].components(separatedBy: "-")
@@ -112,12 +117,12 @@ open class WebViewAssetHandler: NSObject, WKURLSchemeHandler {
 
     open func mimeTypeForExtension(pathExtension: String) -> String {
         if !pathExtension.isEmpty {
-            if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as NSString, nil)?.takeRetainedValue() {
-                if let mimetype = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() {
-                    return mimetype as String
+            if let uti = UTType(filenameExtension: pathExtension) {
+                if let mimetype = uti.preferredMIMEType {
+                    return mimetype
                 }
             }
-            // TODO: Remove in the future if Apple fixes the issue
+            // TODO: Remove when deployment target is set to iOS 17
             if let mimeType = mimeTypes[pathExtension] {
                 return mimeType
             }
@@ -138,20 +143,12 @@ open class WebViewAssetHandler: NSObject, WKURLSchemeHandler {
     func handleCapacitorHttpRequest(_ urlSchemeTask: WKURLSchemeTask, _ localUrl: URL, _ isHttpsRequest: Bool) {
         var urlRequest = urlSchemeTask.request
         guard let url = urlRequest.url else { return }
-        var targetUrl = url.absoluteString
-            .replacingOccurrences(of: CapacitorBridge.httpInterceptorStartIdentifier, with: "")
-            .replacingOccurrences(of: CapacitorBridge.httpsInterceptorStartIdentifier, with: "")
-        // Only replace first occurrence of the scheme
-        if let range = targetUrl.range(of: localUrl.scheme ?? InstanceDescriptorDefaults.scheme) {
-            targetUrl = targetUrl.replacingCharacters(in: range, with: isHttpsRequest ? "https" : "http")
-        }
 
-        // Only replace first occurrence of the hostname
-        if let range = targetUrl.range(of: (localUrl.host ?? InstanceDescriptorDefaults.hostname) + "/") {
-            targetUrl = targetUrl.replacingCharacters(in: range, with: "")
+        let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        if let targetUrl = urlComponents?.queryItems?.first(where: { $0.name == CapacitorBridge.httpInterceptorUrlParam })?.value,
+           !targetUrl.isEmpty {
+            urlRequest.url = URL(string: targetUrl)
         }
-
-        urlRequest.url = URL(string: targetUrl.removingPercentEncoding ?? targetUrl)
 
         let urlSession = URLSession.shared
         let task = urlSession.dataTask(with: urlRequest) { (data, response, error) in
@@ -166,12 +163,13 @@ open class WebViewAssetHandler: NSObject, WKURLSchemeHandler {
                     let existingHeaders = response.allHeaderFields
                     var newHeaders: [AnyHashable: Any] = [:]
 
+                    // Nothing should render this. If anything does, sandbox keeps it inert.
+                    newHeaders["Content-Security-Policy"] = "sandbox; frame-ancestors 'none'"
+
                     // if using live reload, then set CORS headers
                     if self.isUsingLiveReload(url) {
-                        newHeaders = [
-                            "Access-Control-Allow-Origin": self.serverUrl?.absoluteString ?? "",
-                            "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS, TRACE"
-                        ]
+                        newHeaders["Access-Control-Allow-Origin"] = self.serverUrl?.absoluteString ?? ""
+                        newHeaders["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS, TRACE"
                     }
 
                     if let mergedHeaders = existingHeaders.merging(newHeaders, uniquingKeysWith: { (_, newHeaders) in newHeaders }) as? [String: String] {

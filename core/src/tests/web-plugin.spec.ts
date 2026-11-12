@@ -137,10 +137,7 @@ describe('Web Plugin', () => {
   });
 
   it('Should register and remove window listeners', async () => {
-    const pluginAddWindowListener = jest.spyOn(
-      MockPlugin.prototype as any,
-      'addWindowListener',
-    );
+    const pluginAddWindowListener = jest.spyOn(MockPlugin.prototype as any, 'addWindowListener');
     plugin.registerFakeWindowListener();
 
     const lf = jest.fn();
@@ -183,5 +180,31 @@ describe('Web Plugin', () => {
     window.dispatchEvent(event);
 
     expect(handlerFunction).not.toHaveBeenCalled();
+  });
+
+  it('Should not remove a listener if it is not found', async () => {
+    const lf1 = (event: any) => {
+      console.log(event);
+    };
+    const lf2 = (event: any) => {
+      console.log(event);
+    };
+    const lf3 = (event: any) => {
+      console.log(event);
+    };
+
+    await plugin.addListener('test', lf1);
+    await plugin.addListener('test', lf2);
+
+    const listenersBefore = plugin.getListeners()['test'];
+    expect(listenersBefore.length).toEqual(2);
+
+    // Try to remove a listener that was never added
+    await (plugin as any).removeListener('test', lf3);
+
+    const listenersAfter = plugin.getListeners()['test'];
+    expect(listenersAfter.length).toEqual(2);
+    expect(listenersAfter[0]).toBe(lf1);
+    expect(listenersAfter[1]).toBe(lf2);
   });
 });

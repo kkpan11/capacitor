@@ -1,11 +1,4 @@
-import {
-  readdirSync,
-  existsSync,
-  readFileSync,
-  writeFileSync,
-  unlinkSync,
-  lstatSync,
-} from '@ionic/utils-fs';
+import { readdirSync, existsSync, readFileSync, writeFileSync, unlinkSync, lstatSync } from 'fs-extra';
 import { join, extname } from 'path';
 
 import type { Config } from '../definitions';
@@ -13,19 +6,18 @@ import { logger } from '../log';
 
 function walkDirectory(dirPath: string) {
   const files = readdirSync(dirPath);
-  files.forEach(file => {
+  files.forEach((file) => {
     const targetFile = join(dirPath, file);
     if (existsSync(targetFile) && lstatSync(targetFile).isDirectory()) {
       walkDirectory(targetFile);
     } else {
       const mapFile = join(dirPath, `${file}.map`);
-      if (extname(file) === '.js' && existsSync(mapFile)) {
+      if ((extname(file) === '.js' || extname(file) === '.css') && existsSync(mapFile)) {
         const bufMap = readFileSync(mapFile).toString('base64');
         const bufFile = readFileSync(targetFile, 'utf8');
         const result = bufFile.replace(
           `sourceMappingURL=${file}.map`,
-          'sourceMappingURL=data:application/json;charset=utf-8;base64,' +
-            bufMap,
+          'sourceMappingURL=data:application/json;charset=utf-8;base64,' + bufMap,
         );
         writeFileSync(targetFile, result);
         unlinkSync(mapFile);
@@ -34,10 +26,7 @@ function walkDirectory(dirPath: string) {
   });
 }
 
-export async function inlineSourceMaps(
-  config: Config,
-  platformName: string,
-): Promise<void> {
+export async function inlineSourceMaps(config: Config, platformName: string): Promise<void> {
   let buildDir = '';
 
   if (platformName == config.ios.name) {

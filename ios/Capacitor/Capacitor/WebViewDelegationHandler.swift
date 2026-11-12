@@ -47,7 +47,6 @@ open class WebViewDelegationHandler: NSObject, WKNavigationDelegate, WKUIDelegat
         bridge?.reset()
     }
 
-    @available(iOS 15, *)
     open func webView(
         _ webView: WKWebView,
         requestMediaCapturePermissionFor origin: WKSecurityOrigin,
@@ -58,7 +57,6 @@ open class WebViewDelegationHandler: NSObject, WKNavigationDelegate, WKUIDelegat
         decisionHandler(.grant)
     }
 
-    @available(iOS 15, *)
     open func webView(_ webView: WKWebView,
                       requestDeviceOrientationAndMotionPermissionFor origin: WKSecurityOrigin,
                       initiatedByFrame frame: WKFrameInfo,
@@ -73,6 +71,12 @@ open class WebViewDelegationHandler: NSObject, WKNavigationDelegate, WKUIDelegat
         // sanity check, these shouldn't ever be nil in practice
         guard let bridge = bridge, let navURL = navigationAction.request.url else {
             decisionHandler(.allow)
+            return
+        }
+
+        // The proxy returns a remote body at the app origin, so block it before plugins can allow it.
+        if navURL.path.starts(with: CapacitorBridge.httpInterceptorStartIdentifier) {
+            decisionHandler(.cancel)
             return
         }
 
@@ -109,7 +113,7 @@ open class WebViewDelegationHandler: NSObject, WKNavigationDelegate, WKUIDelegat
 
         if !isApplicationNavigation, toplevelNavigation {
             // disallow and let the system handle it
-            if UIApplication.shared.applicationState == .active {
+            if webView.window?.windowScene?.activationState == .foregroundActive {
                 UIApplication.shared.open(navURL, options: [:], completionHandler: nil)
             }
             decisionHandler(.cancel)
@@ -158,7 +162,29 @@ open class WebViewDelegationHandler: NSObject, WKNavigationDelegate, WKUIDelegat
     }
 
     open func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        CAPLog.print("⚡️  WebView process terminated")
+        bridge?.reset()
         webView.reload()
+    }
+
+    open func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping @MainActor (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        guard let bridge = bridge else {
+            completionHandler(.rejectProtectionSpace, nil)
+            return
+        }
+
+        for pluginObject in bridge.plugins {
+            let plugin = pluginObject.value
+            let selector = NSSelectorFromString("handleWKWebViewURLAuthenticationChallenge:completionHandler:")
+            if plugin.responds(to: selector) {
+                if plugin.handleWKWebViewURLAuthenticationChallenge(challenge, completionHandler: completionHandler) {
+                    return
+                }
+            }
+        }
+
+        completionHandler(.rejectProtectionSpace, nil)
+        return
     }
 
     // MARK: - WKScriptMessageHandler
@@ -261,16 +287,6 @@ open class WebViewDelegationHandler: NSObject, WKNavigationDelegate, WKUIDelegat
                         CapacitorCookieManager(bridge!.config).setCookie(domain, action)
                         completionHandler("")
                         // swiftlint:enable force_cast
-                        // Don't present prompt
-                        return
-                    } else if type == "CapacitorCookies.isEnabled" {
-                        let pluginConfig = bridge!.config.getPluginConfig("CapacitorCookies")
-                        completionHandler(String(pluginConfig.getBoolean("enabled", false)))
-                        // Don't present prompt
-                        return
-                    } else if type == "CapacitorHttp" {
-                        let pluginConfig = bridge!.config.getPluginConfig("CapacitorHttp")
-                        completionHandler(String(pluginConfig.getBoolean("enabled", false)))
                         // Don't present prompt
                         return
                     }
